@@ -1,0 +1,14 @@
+port: 7880
+keys:
+  devkey: 12345678901234567890123456789012
+redis:
+  address: redis:6379
+rtc:
+  tcp_port: 7881
+  port_range_start: 50000  
+  port_range_end: 60000
+  node_ip: 117.72.204.201
+  use_external_ip: true
+  stun_servers:
+    - stun.l.google.com:19302
+    - global.stun.twilio.com:3478
