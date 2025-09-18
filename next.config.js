@@ -34,6 +34,41 @@ const nextConfig = {
             key: 'Cross-Origin-Embedder-Policy',
             value: 'credentialless',
           },
+          // 允许 LiveKit 跨域访问
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: 'https://livekit.matrix-net.tech',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET,POST,PUT,DELETE,OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type,Authorization,x-livekit-*',
+          },
+          {
+            key: 'Access-Control-Allow-Credentials',
+            value: 'true',
+          },
+        ],
+      },
+      // API 路由的特殊处理
+      {
+        source: '/api/(.*)',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET,POST,PUT,DELETE,OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type,Authorization,x-livekit-*',
+          },
         ],
       },
     ];
