@@ -1,35 +1,36 @@
+
 # 使用官方 Node.js 18 Alpine 镜像作为基础镜像
 FROM node:18-alpine AS base
 
 # 安装依赖阶段
 FROM base AS deps
-# 检查并安装 libc6-compat（对于某些原生依赖可能需要）
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# 复制 package 文件
-COPY package.json package-lock.json* ./
+# 复制 pnpm 配置和依赖文件
+COPY package.json pnpm-lock.yaml ./
+# 安装 pnpm
+RUN npm install -g pnpm@8.15.4
 # 安装依赖（只安装生产依赖）
-RUN npm ci --only=production
+RUN pnpm install --frozen-lockfile --prod
 
 # 构建阶段
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY . .
-
 # 安装所有依赖（包括开发依赖，用于构建）
-RUN npm ci
+RUN npm install -g pnpm@8.15.4
+RUN pnpm install --frozen-lockfile
 
-# 生成 GraphQL 类型（如果需要）
-# RUN npm run codegen
-
-# 构建应用
+# 构建 Next.js 应用
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+RUN pnpm run build
+
 
 # 生产运行阶段
-FROM base AS runner
+FROM node:18-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -41,23 +42,16 @@ RUN adduser --system --uid 1001 nextjs
 
 # 复制构建输出
 COPY --from=builder /app/public ./public
-
-# 设置正确的权限和复制 .next 目录
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# 自动利用输出跟踪来减少镜像大小
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/node_modules ./node_modules
 
 # 复制健康检查脚本
-COPY --chown=nextjs:nodejs healthcheck.js ./
+COPY healthcheck.js ./
 
 USER nextjs
 
 EXPOSE 3000
-
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
@@ -65,5 +59,5 @@ ENV HOSTNAME="0.0.0.0"
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node healthcheck.js || exit 1
 
-# 使用 standalone 输出启动服务器
+# 使用 Next.js standalone 输出启动服务器
 CMD ["node", "server.js"]
