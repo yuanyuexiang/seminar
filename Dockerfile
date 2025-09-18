@@ -24,7 +24,7 @@ WORKDIR /app
 
 # 复制依赖文件并安装所有依赖（包括开发依赖）
 COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --ignore-pnpmfile --shamefully-hoist
+RUN pnpm install --ignore-pnpmfile --shamefully-hoist --no-optional
 
 # 复制 Next.js 配置文件
 COPY next.config.js tsconfig.json next-env.d.ts ./
@@ -36,6 +36,7 @@ COPY public ./public
 COPY app ./app
 COPY lib ./lib
 COPY styles ./styles
+COPY healthcheck.js ./
 
 # 设置环境变量并构建
 ENV NEXT_TELEMETRY_DISABLED=1
