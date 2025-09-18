@@ -3,6 +3,17 @@ services:
     container_name: seminar
     image: ${DOCKER_IMAGE_TAG}
     restart: always
+    environment:
+      # LiveKit 配置
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-12345678901234567890123456789012}
+      - LIVEKIT_URL=${LIVEKIT_URL:-http://livekit.matrix-net.tech:7880}
+      # 可选配置
+      - NEXT_PUBLIC_SHOW_SETTINGS_MENU=${NEXT_PUBLIC_SHOW_SETTINGS_MENU:-true}
+      - NEXT_PUBLIC_LK_RECORD_ENDPOINT=${NEXT_PUBLIC_LK_RECORD_ENDPOINT:-/api/record}
+      # Node 环境
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
     healthcheck:
       disable: true
     networks:
