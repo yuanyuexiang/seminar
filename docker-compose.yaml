@@ -1,0 +1,20 @@
+services:
+   seminar:
+    container_name: seminar
+    image: ${DOCKER_IMAGE_TAG}
+    restart: always
+    healthcheck:
+      disable: true
+    networks:
+      - matrix-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.seminar.rule=Host(`seminar.matrix-net.tech`)" # 替换为你的域名
+      - "traefik.http.routers.seminar.entrypoints=websecure"
+      - "traefik.http.routers.seminar.service=seminar"
+      - "traefik.http.routers.seminar.tls.certresolver=aliyunresolver"
+      - "traefik.http.services.seminar.loadbalancer.server.port=3000"
+
+networks:
+  matrix-network:
+    external: true
