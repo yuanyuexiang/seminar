@@ -15,8 +15,8 @@ WORKDIR /app
 
 # 复制依赖文件
 COPY package.json pnpm-lock.yaml* ./
-# 安装生产依赖（忽略锁文件版本冲突）
-RUN pnpm install --prod --ignore-pnpmfile --shamefully-hoist
+# 安装生产依赖
+RUN pnpm install --prod --ignore-pnpmfile --shamefully-hoist --no-optional
 
 # 构建阶段
 FROM base AS builder
@@ -26,8 +26,16 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install --ignore-pnpmfile --shamefully-hoist
 
+# 复制 Next.js 配置文件
+COPY next.config.js tsconfig.json next-env.d.ts ./
+
+# 复制静态资源（在复制源代码之前先复制静态文件）
+COPY public ./public
+
 # 复制源代码
-COPY . .
+COPY app ./app
+COPY lib ./lib
+COPY styles ./styles
 
 # 设置环境变量并构建
 ENV NEXT_TELEMETRY_DISABLED=1
