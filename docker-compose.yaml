@@ -7,7 +7,7 @@ services:
       # LiveKit 配置
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-12345678901234567890123456789012}
-      - LIVEKIT_URL=${LIVEKIT_URL:-http://livekit.matrix-net.tech:7880}
+      - LIVEKIT_URL=${LIVEKIT_URL:-https://livekit.matrix-net.tech}
       # 可选配置
       - NEXT_PUBLIC_SHOW_SETTINGS_MENU=${NEXT_PUBLIC_SHOW_SETTINGS_MENU:-true}
       - NEXT_PUBLIC_LK_RECORD_ENDPOINT=${NEXT_PUBLIC_LK_RECORD_ENDPOINT:-/api/record}
@@ -20,11 +20,23 @@ services:
       - matrix-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.seminar.rule=Host(`seminar.matrix-net.tech`)" # 替换为你的域名
+      - "traefik.http.routers.seminar.rule=Host(`seminar.matrix-net.tech`)"
       - "traefik.http.routers.seminar.entrypoints=websecure"
       - "traefik.http.routers.seminar.service=seminar"
       - "traefik.http.routers.seminar.tls.certresolver=aliyunresolver"
       - "traefik.http.services.seminar.loadbalancer.server.port=3000"
+
+   # 如果需要为 LiveKit 添加 HTTPS 代理（可选）
+   # livekit-proxy:
+   #   image: traefik/whoami  # 这里应该是你的 LiveKit 服务配置
+   #   networks:
+   #     - matrix-network
+   #   labels:
+   #     - "traefik.enable=true"
+   #     - "traefik.http.routers.livekit.rule=Host(`livekit.matrix-net.tech`)"
+   #     - "traefik.http.routers.livekit.entrypoints=websecure"
+   #     - "traefik.http.routers.livekit.tls.certresolver=aliyunresolver"
+   #     - "traefik.http.services.livekit.loadbalancer.server.port=7880"
 
 networks:
   matrix-network:
