@@ -26,8 +26,8 @@ export function SettingsMenu(props: SettingsMenuProps) {
 
   const settings = React.useMemo(() => {
     return {
-      media: { camera: true, microphone: true, label: 'Media Devices', speaker: true },
-      recording: recordingEndpoint ? { label: 'Recording' } : undefined,
+      media: { camera: true, microphone: true, label: '媒体设备', speaker: true },
+      recording: recordingEndpoint ? { label: '录制' } : undefined,
     };
   }, []);
 
@@ -49,10 +49,10 @@ export function SettingsMenu(props: SettingsMenuProps) {
 
   const toggleRoomRecording = async () => {
     if (!recordingEndpoint) {
-      throw TypeError('No recording endpoint specified');
+      throw TypeError('未指定录制端点');
     }
     if (room.isE2EEEnabled) {
-      throw Error('Recording of encrypted meetings is currently not supported');
+      throw Error('目前不支持加密会议的录制功能');
     }
     setProcessingRecRequest(true);
     setInitialRecStatus(isRecording);
@@ -65,7 +65,7 @@ export function SettingsMenu(props: SettingsMenuProps) {
     if (response.ok) {
     } else {
       console.error(
-        'Error handling recording request, check server logs:',
+        '处理录制请求时出错，请查看服务器日志：',
         response.status,
         response.statusText,
       );
@@ -98,7 +98,7 @@ export function SettingsMenu(props: SettingsMenuProps) {
           <>
             {settings.media && settings.media.camera && (
               <>
-                <h3>Camera</h3>
+                <h3>摄像头</h3>
                 <section>
                   <CameraSettings />
                 </section>
@@ -106,7 +106,7 @@ export function SettingsMenu(props: SettingsMenuProps) {
             )}
             {settings.media && settings.media.microphone && (
               <>
-                <h3>Microphone</h3>
+                <h3>麦克风</h3>
                 <section>
                   <MicrophoneSettings />
                 </section>
@@ -127,15 +127,15 @@ export function SettingsMenu(props: SettingsMenuProps) {
         )}
         {activeTab === 'recording' && (
           <>
-            <h3>Record Meeting</h3>
+            <h3>录制会议</h3>
             <section>
               <p>
                 {isRecording
-                  ? 'Meeting is currently being recorded'
-                  : 'No active recordings for this meeting'}
+                  ? '会议正在录制中'
+                  : '此会议没有进行中的录制'}
               </p>
               <button disabled={processingRecRequest} onClick={() => toggleRoomRecording()}>
-                {isRecording ? 'Stop' : 'Start'} Recording
+                {isRecording ? '停止' : '开始'} 录制
               </button>
             </section>
           </>
@@ -146,7 +146,7 @@ export function SettingsMenu(props: SettingsMenuProps) {
           className={`lk-button`}
           onClick={() => layoutContext?.widget.dispatch?.({ msg: 'toggle_settings' })}
         >
-          Close
+          关闭
         </button>
       </div>
     </div>

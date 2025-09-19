@@ -13,6 +13,18 @@ import {
   PreJoin,
   RoomContext,
   VideoConference,
+  ControlBar,
+  GridLayout,
+  ParticipantTile,
+  LayoutContextProvider,
+  FocusLayout,
+  FocusLayoutContainer,
+  CarouselLayout,
+  ConnectionStateToast,
+  RoomAudioRenderer,
+  useTracks,
+  usePinnedTracks,
+  useCreateLayoutContext,
 } from '@livekit/components-react';
 import {
   ExternalE2EEKeyProvider,
@@ -25,9 +37,11 @@ import {
   RoomEvent,
   TrackPublishDefaults,
   VideoCaptureOptions,
+  Track,
 } from 'livekit-client';
 import { useRouter } from 'next/navigation';
 import { useSetupE2EE } from '@/lib/useSetupE2EE';
+import { ChatChinese } from '@/lib/ChatChinese';
 import { useLowCPUOptimizer } from '@/lib/usePerfomanceOptimiser';
 
 const CONN_DETAILS_ENDPOINT =
@@ -45,7 +59,7 @@ export function PageClientImpl(props: {
   );
   const preJoinDefaults = React.useMemo(() => {
     return {
-      username: '',
+      username: '参会者',
       videoEnabled: true,
       audioEnabled: true,
     };
@@ -76,6 +90,10 @@ export function PageClientImpl(props: {
             defaults={preJoinDefaults}
             onSubmit={handlePreJoinSubmit}
             onError={handlePreJoinError}
+            joinLabel="加入房间"
+            micLabel="麦克风"
+            camLabel="摄像头"
+            userLabel="用户名"
           />
         </div>
       ) : (
@@ -142,7 +160,7 @@ function VideoConferenceComponent(props: {
           room.setE2EEEnabled(true).catch((e) => {
             if (e instanceof DeviceUnsupportedError) {
               alert(
-                `You're trying to join an encrypted meeting, but your browser does not support it. Please update it to the latest version and try again.`,
+                `您正在尝试加入加密会议，但您的浏览器不支持此功能。请更新到最新版本后重试。`,
               );
               console.error(e);
             } else {
@@ -201,18 +219,18 @@ function VideoConferenceComponent(props: {
   const handleOnLeave = React.useCallback(() => router.push('/'), [router]);
   const handleError = React.useCallback((error: Error) => {
     console.error(error);
-    alert(`Encountered an unexpected error, check the console logs for details: ${error.message}`);
+    alert(`遇到了意外错误，请查看控制台了解详情：${error.message}`);
   }, []);
   const handleEncryptionError = React.useCallback((error: Error) => {
     console.error(error);
     alert(
-      `Encountered an unexpected encryption error, check the console logs for details: ${error.message}`,
+      `遇到了意外的加密错误，请查看控制台了解详情：${error.message}`,
     );
   }, []);
 
   React.useEffect(() => {
     if (lowPowerMode) {
-      console.warn('Low power mode enabled');
+      console.warn('已启用低功耗模式');
     }
   }, [lowPowerMode]);
 
@@ -220,13 +238,91 @@ function VideoConferenceComponent(props: {
     <div className="lk-room-container">
       <RoomContext.Provider value={room}>
         <KeyboardShortcuts />
-        <VideoConference
+        <CustomVideoConference
           chatMessageFormatter={formatChatMessageLinks}
           SettingsComponent={SHOW_SETTINGS_MENU ? SettingsMenu : undefined}
         />
         <DebugMode />
         <RecordingIndicator />
       </RoomContext.Provider>
+    </div>
+  );
+}
+
+// 自定义 VideoConference 组件，控制栏只显示图标
+function CustomVideoConference({ 
+  chatMessageFormatter, 
+  SettingsComponent 
+}: {
+  chatMessageFormatter?: any;
+  SettingsComponent?: React.ComponentType;
+}) {
+  const [widgetState, setWidgetState] = React.useState({
+    showChat: false,
+    unreadMessages: 0,
+    showSettings: false,
+  });
+
+  const layoutContext = useCreateLayoutContext();
+  
+  const tracks = useTracks(
+    [
+      { source: Track.Source.Camera, withPlaceholder: true },
+      { source: Track.Source.ScreenShare, withPlaceholder: false },
+    ],
+    { onlySubscribed: false },
+  );
+
+  const widgetUpdate = (state: any) => {
+    setWidgetState(state);
+  };
+
+  const focusTrack = usePinnedTracks(layoutContext)?.[0];
+  const carouselTracks = tracks.filter((track) => !focusTrack || track.publication?.trackSid !== focusTrack.publication?.trackSid);
+
+  return (
+    <div className="lk-video-conference">
+      <LayoutContextProvider
+        value={layoutContext}
+        onWidgetChange={widgetUpdate}
+      >
+        <div className="lk-video-conference-inner">
+          {!focusTrack ? (
+            <div className="lk-grid-layout-wrapper">
+              <GridLayout tracks={tracks}>
+                <ParticipantTile />
+              </GridLayout>
+            </div>
+          ) : (
+            <div className="lk-focus-layout-wrapper">
+              <FocusLayoutContainer>
+                <CarouselLayout tracks={carouselTracks}>
+                  <ParticipantTile />
+                </CarouselLayout>
+                {focusTrack && <FocusLayout trackRef={focusTrack} />}
+              </FocusLayoutContainer>
+            </div>
+          )}
+          <ControlBar 
+            variation="minimal"
+            controls={{ chat: true, settings: !!SettingsComponent }} 
+          />
+        </div>
+        <ChatChinese
+          style={{ display: widgetState.showChat ? 'grid' : 'none' }}
+          messageFormatter={chatMessageFormatter}
+        />
+        {SettingsComponent && (
+          <div
+            className="lk-settings-menu-modal"
+            style={{ display: widgetState.showSettings ? 'block' : 'none' }}
+          >
+            <SettingsComponent />
+          </div>
+        )}
+      </LayoutContextProvider>
+      <RoomAudioRenderer />
+      <ConnectionStateToast />
     </div>
   );
 }

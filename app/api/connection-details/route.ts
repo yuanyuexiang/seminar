@@ -18,19 +18,19 @@ export async function GET(request: NextRequest) {
     const metadata = request.nextUrl.searchParams.get('metadata') ?? '';
     const region = request.nextUrl.searchParams.get('region');
     if (!LIVEKIT_URL) {
-      throw new Error('LIVEKIT_URL is not defined');
+      throw new Error('LIVEKIT_URL 未定义');
     }
     const livekitServerUrl = region ? getLiveKitURL(LIVEKIT_URL, region) : LIVEKIT_URL;
     let randomParticipantPostfix = request.cookies.get(COOKIE_KEY)?.value;
     if (livekitServerUrl === undefined) {
-      throw new Error('Invalid region');
+      throw new Error('无效的区域');
     }
 
     if (typeof roomName !== 'string') {
-      return new NextResponse('Missing required query parameter: roomName', { status: 400 });
+      return new NextResponse('缺少必需的查询参数：roomName', { status: 400 });
     }
     if (participantName === null) {
-      return new NextResponse('Missing required query parameter: participantName', { status: 400 });
+      return new NextResponse('缺少必需的查询参数：participantName', { status: 400 });
     }
 
     // Generate participant token

@@ -14,7 +14,7 @@ export function MicrophoneSettings() {
         quality: isLowPowerDevice() ? 'low' : 'medium',
         onBufferDrop: () => {
           console.warn(
-            'krisp buffer dropped, noise filter versions >= 0.3.2 will automatically disable the filter',
+            'krisp 缓冲区溢出，噪声滤波器版本 >= 0.3.2 将自动禁用滤波器',
           );
         },
       },
@@ -36,7 +36,7 @@ export function MicrophoneSettings() {
       }}
     >
       <section className="lk-button-group">
-        <TrackToggle source={Track.Source.Microphone}>Microphone</TrackToggle>
+        <TrackToggle source={Track.Source.Microphone}>麦克风</TrackToggle>
         <div className="lk-button-group-menu">
           <MediaDeviceMenu kind="audioinput" />
         </div>
@@ -48,7 +48,7 @@ export function MicrophoneSettings() {
         disabled={isNoiseFilterPending}
         aria-pressed={isNoiseFilterEnabled}
       >
-        {isNoiseFilterEnabled ? 'Disable' : 'Enable'} Enhanced Noise Cancellation
+        {isNoiseFilterEnabled ? '禁用' : '启用'} 增强降噪
       </button>
     </div>
   );

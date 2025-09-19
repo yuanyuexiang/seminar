@@ -54,19 +54,19 @@ function DemoMeetingTab(props: { label: string }) {
   };
   return (
     <div className={styles.tabContent}>
-      <p style={{ margin: 0 }}>Try LiveKit Meet for free with our live demo project.</p>
+      <p style={{ margin: 0 }}>轻量级会议系统仅供演示使用</p>
       <button style={{ marginTop: '1rem' }} className="lk-button" onClick={startMeeting}>
-        Start Meeting
+        那就开会吧
       </button>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
-          <input
+          {/* <input
             id="use-e2ee"
             type="checkbox"
             checked={e2ee}
             onChange={(ev) => setE2ee(ev.target.checked)}
-          ></input>
-          <label htmlFor="use-e2ee">Enable end-to-end encryption</label>
+          ></input> */}
+          {/* <label htmlFor="use-e2ee">Enable end-to-end encryption</label> */}
         </div>
         {e2ee && (
           <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
@@ -165,27 +165,20 @@ export default function Page() {
     <>
       <main className={styles.main} data-lk-theme="default">
         <div className="header">
-          <img src="/images/livekit-meet-home.svg" alt="LiveKit Meet" width="360" height="45" />
+          {/* <img src="/images/livekit-meet-home.svg" alt="LiveKit Meet" width="360" height="45" /> */}
           <h2>
-            Open source video conferencing app built on{' '}
-            <a href="https://github.com/livekit/components-js?ref=meet" rel="noopener">
-              LiveKit&nbsp;Components
-            </a>
-            ,{' '}
-            <a href="https://livekit.io/cloud?ref=meet" rel="noopener">
-              LiveKit&nbsp;Cloud
-            </a>{' '}
-            and Next.js.
+            欢迎使用轻量级会议系统
           </h2>
         </div>
         <Suspense fallback="Loading">
-          <Tabs>
+          <DemoMeetingTab label="Demo" />
+          {/* <Tabs>
             <DemoMeetingTab label="Demo" />
             <CustomConnectionTab label="Custom" />
-          </Tabs>
+          </Tabs> */}
         </Suspense>
       </main>
-      <footer data-lk-theme="default">
+      {/* <footer data-lk-theme="default">
         Hosted on{' '}
         <a href="https://livekit.io/cloud?ref=meet" rel="noopener">
           LiveKit Cloud
@@ -193,9 +186,9 @@ export default function Page() {
         . Source code on{' '}
         <a href="https://github.com/livekit/meet?ref=meet" rel="noopener">
           GitHub
-        </a>
+        </a> 
         .
-      </footer>
+      </footer>*/}
     </>
   );
 }

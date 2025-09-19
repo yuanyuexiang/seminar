@@ -11,8 +11,8 @@ import { isLocalTrack, LocalTrackPublication, Track } from 'livekit-client';
 
 // Background image paths - 使用字符串路径避免构建时导入问题
 const BACKGROUND_IMAGES = [
-  { name: 'Desk', path: '/background-images/samantha-gades-BlIhVfXbi9s-unsplash.jpg' },
-  { name: 'Nature', path: '/background-images/ali-kazal-tbw_KQE3Cbg-unsplash.jpg' },
+  { name: '办公桌', path: '/background-images/samantha-gades-BlIhVfXbi9s-unsplash.jpg' },
+  { name: '自然风光', path: '/background-images/ali-kazal-tbw_KQE3Cbg-unsplash.jpg' },
 ];
 
 // Background options
@@ -74,14 +74,14 @@ export function CameraSettings() {
       )}
 
       <section className="lk-button-group">
-        <TrackToggle source={Track.Source.Camera}>Camera</TrackToggle>
+        <TrackToggle source={Track.Source.Camera}>摄像头</TrackToggle>
         <div className="lk-button-group-menu">
           <MediaDeviceMenu kind="videoinput" />
         </div>
       </section>
 
       <div style={{ marginTop: '10px' }}>
-        <div style={{ marginBottom: '8px' }}>Background Effects</div>
+        <div style={{ marginBottom: '8px' }}>背景效果</div>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <button
             onClick={() => selectBackground('none')}
@@ -92,7 +92,7 @@ export function CameraSettings() {
               minWidth: '80px',
             }}
           >
-            None
+            无
           </button>
 
           <button
@@ -130,7 +130,7 @@ export function CameraSettings() {
                 fontSize: '12px',
               }}
             >
-              Blur
+              模糊
             </span>
           </button>
 
